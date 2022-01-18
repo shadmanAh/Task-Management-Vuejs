@@ -22,18 +22,16 @@ var app = new Vue({
               `,
     },
   },
-  data() {
-    return {
-      tasks: [
-        { id:1, name: 'Todo 1', description: 'This is a todo', completed: false },
-        { id:2, name: 'Todo 2', description: 'This is another todo', completed: true },
-        { id:3, name: 'Todo Three', description: 'This is complete todo', completed: true },
-        { id:4, name: 'Four', description: 'This is another complete todo', completed: true },
-      ],
-      task: {},
-      message: 'Hello World!',
-      action: 'create',
-    }
+  data: {
+    tasks: [
+      { id:1, name: 'Todo 1', description: 'This is a todo', completed: false },
+      { id:2, name: 'Todo 2', description: 'This is another todo', completed: true },
+      { id:3, name: 'Todo Three', description: 'This is complete todo', completed: true },
+      { id:4, name: 'Four', description: 'This is another complete todo', completed: true },
+    ],
+    task: {},
+    message: '',
+    action: 'create',
   },
   computed: {
     completedTasks() {
@@ -50,17 +48,16 @@ var app = new Vue({
     clear() {
       this.task = {};
       this.action = 'create';
+      this.message = '';
     },
     toggleDone(event, id) {
-      event.stopImmediatePropagation();
       let task = this.tasks.find(item => item.id == id);
       if(task) {
         task.completed = !task.completed;
-        console.log('task toggle');
+        this.message = `Task ${id} updated.`;
       }
     },
     createTask(event) {
-      event.preventDefault();
       if(!this.task.completed) {
         this.task.completed = false;
       } else {
@@ -72,6 +69,7 @@ var app = new Vue({
       this.task.id = taskId;
       this.tasks.push(this.task);
       this.clear();
+      this.message = `Task ${taskId} created.`;
     },
     editTask(event, id) {
       this.action = 'edit';
@@ -85,21 +83,21 @@ var app = new Vue({
     },
     updateTask(event, id) {
       event.stopImmediatePropagation();
-      event.preventDefault();
       let task = this.tasks.find(item => item.id ==id);
       if(task) {
         task.name = this.task.name;
         task.description = this.task.description;
         task.completed = this.task.completed;
+        this.message = `Task ${id} updated.`;
       }
     },
     deleteTask(event, id) {
       event.stopImmediatePropagation();
       let taskIndex = this.tasks.findIndex(item => item.id == id);
       if(taskIndex > -1) {
-        this.$delete(this.tasks, taskIndex)
+        this.$delete(this.tasks, taskIndex);
+        this.message = `Task ${id} deleted.`;
       }
-      console.log('task deleted')
     }
   },
 })
