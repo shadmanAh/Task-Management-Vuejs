@@ -31,7 +31,8 @@ var app = new Vue({
         { id:4, name: 'Four', description: 'This is another complete todo', completed: true },
       ],
       task: {},
-      message: 'Hello World!'
+      message: 'Hello World!',
+      action: 'create',
     }
   },
   computed: {
@@ -40,9 +41,16 @@ var app = new Vue({
     },
     todoTasks() {
       return this.tasks.filter( item => item.completed == false );
-    }
+    },
+    nextId() {
+      return (this.tasks.sort(function(a,b){ return a.id - b.id; }))[this.tasks.length - 1].id + 1;
+    },
   },
   methods: {
+    clear() {
+      this.task = {};
+      this.action = 'create';
+    },
     toggleDone(event, id) {
       event.stopImmediatePropagation();
       let task = this.tasks.find(item => item.id == id);
@@ -51,10 +59,38 @@ var app = new Vue({
         console.log('task toggle');
       }
     },
+    createTask(event) {
+      event.preventDefault();
+      if(!this.task.completed) {
+        this.task.completed = false;
+      } else {
+        this.task.completed = true;
+      }
+
+      let taskId = this.nextId;
+
+      this.task.id = taskId;
+      this.tasks.push(this.task);
+      this.clear();
+    },
     editTask(event, id) {
+      this.action = 'edit';
       let task = this.tasks.find(item => item.id == id);
       if(task) {
-        this.task = { name: task.name, description: task.description, completed: task.completed };
+        this.task = { id: id, 
+                      name: task.name, 
+                      description: task.description, 
+                      completed: task.completed };
+      }
+    },
+    updateTask(event, id) {
+      event.stopImmediatePropagation();
+      event.preventDefault();
+      let task = this.tasks.find(item => item.id ==id);
+      if(task) {
+        task.name = this.task.name;
+        task.description = this.task.description;
+        task.completed = this.task.completed;
       }
     },
     deleteTask(event, id) {
